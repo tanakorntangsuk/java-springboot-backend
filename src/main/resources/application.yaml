@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: smtp.gmail.com #gmail
+    port: 587
+    username: tanakorn.devtest
+    password: wmns qeay vjyz slki
+    properties:
+      mail:
+        smtp:
+          auth: ture
+          starttls:
+            enable: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,8 +28,5 @@ app:
   token:
     secret: "my-super-secret-key-32-chars-minimum!!"
     issuer: "BackendService"
-
-logging:
-  level:
-    org.springframework.web: DEBUG
-    org.springframework.web.servlet.DispatcherServlet: DEBUG
+  email:
+    from: tanakorn.devtest@gmail.com

@@ -30,7 +30,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())  // ปิด CSRF protection
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("api/register", "api/login").permitAll() // อนุญาตให้เข้า endpoint นี้ โดยไม่ต้อง login
+                        .requestMatchers("/api/register", "/api/login","/actuator/**").permitAll() // อนุญาตให้เข้า endpoint นี้ โดยไม่ต้อง login
                         .anyRequest().authenticated() // ทุก endpoint อื่น ๆ ต้อง login ก่อน
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class); //ตรวจสอบ tokenFilter UsernamePasswordAuthenticationFilter

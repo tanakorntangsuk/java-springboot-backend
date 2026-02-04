@@ -8,9 +8,11 @@ import com.example.backend.exception.BaseException;
 import com.example.backend.exception.UserException;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.util.SecurityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,10 +25,33 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    private final TokenService tokenService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, TokenService tokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.tokenService = tokenService;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public String refreshToken() throws BaseException {
+        Optional<String> opt = SecurityUtil.getCurrentUserId();
+        if (opt.isEmpty()) {
+            throw UserException.unauthorized();
+        }
+
+        String userId = opt.get();
+
+        Optional<User> optUser = userRepository.findById(userId);
+        if (optUser.isEmpty()) {
+            throw UserException.notFound();
+        }
+        User user = optUser.get();
+        return tokenService.tokenize(user);
     }
 
     public String login(LoginRequest request) throws BaseException {
@@ -44,9 +69,10 @@ public class UserService {
             if (!passwordEncoder.matches(password, user.getPassword())) { //เช็ครหัสผ่าน hash password ที่ user กรอก เทียบกับ hash ใน DB
                 throw UserException.loginFailPasswordIncorrect();
             }
+
+            // TODO JWT
+            return tokenService.tokenize(user);
         }
-        // TODO JWT
-        return "login done";
     }
 
     public RegisterResponse create(RegisterRequest request) throws BaseException {
@@ -84,19 +110,18 @@ public class UserService {
         }
     }
 
-    public User updateUser(User user){
+    public User updateUser(User user) {
         return userRepository.save(user);
     }
 
-    public User updateNameById(String id,String name) throws BaseException {
-        User user = userRepository.findById(id)
-                .orElseThrow(UserException::notFound);
+    public User updateNameById(String id, String name) throws BaseException {
+        User user = userRepository.findById(id).orElseThrow(UserException::notFound);
 
         user.setName(name);
         return userRepository.save(user);
     }
 
-    public void deleteById (String id){
+    public void deleteById(String id) {
         userRepository.deleteById(id);
     }
 }

@@ -8,7 +8,8 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Entity(name = "user_product")
+@Entity
+@Table(name = "user_product")
 public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 60)

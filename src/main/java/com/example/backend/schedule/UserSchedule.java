@@ -23,27 +23,27 @@ public class UserSchedule {
     // 5 => month
     // 6 => year
 
-    /**
-     * Every minute
-     */
-    @Scheduled(cron = "0 * * * * *", zone = "Asia/Bangkok")
-    public void testEveryMinute() {
-        log.info("Hello, What's up");
-    }
-
-    /**
-     * Every day 00:00
-     */
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
-    public void testEveryMidNight() {
-        log.info("Hello, What's up");
-    }
-
-    /**
-     * Every day 14:45
-     */
-    @Scheduled(cron = "0 45 14 * * *", zone = "Asia/Bangkok")
-    public void testEveryDayNineAM() {
-        log.info("Hay, What's up");
-    }
+//    /**
+//     * Every minute
+//     */
+//    @Scheduled(cron = "0 * * * * *", zone = "Asia/Bangkok")
+//    public void testEveryMinute() {
+//        log.info("Hello, What's up");
+//    }
+//
+//    /**
+//     * Every day 00:00
+//     */
+//    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
+//    public void testEveryMidNight() {
+//        log.info("Hello, What's up");
+//    }
+//
+//    /**
+//     * Every day 14:45
+//     */
+//    @Scheduled(cron = "0 45 14 * * *", zone = "Asia/Bangkok")
+//    public void testEveryDayNineAM() {
+//        log.info("Hay, What's up");
+//    }
 }

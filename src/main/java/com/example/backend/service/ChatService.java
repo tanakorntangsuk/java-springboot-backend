@@ -29,7 +29,7 @@ public class ChatService {
 
         // TODO: validate message
 
-        final String destination = "chat";
+        final String destination = "/topic/chat";
 
         ChatMessageResponse payload = new ChatMessageResponse();
         payload.setFrom(opt.get());

@@ -147,14 +147,19 @@ public class UserService {
         if (opt.isEmpty()){
             throw UserException.activateFail();
         }
+
         User user = opt.get();
+
+        if (user.isActivated()){
+            throw UserException.activateAlready();
+        }
+
         Date now = new Date();
         Date expireDate = user.getTokenExpire();
 
         // Token หมดอายุ
         if (now.after(expireDate)){
             // TODO: re-email
-
             throw UserException.activateTokenExpireDate();
         }
         user.setActivated(true);
@@ -163,6 +168,30 @@ public class UserService {
         ActivateResponse response = new ActivateResponse();
         response.setSuccess(true);
         return response;
+    }
+
+    public String resendActivationEmail(ResendActivationEmailRequest request) throws BaseException {
+        String email = request.getEmail();
+        if (StringUtil.isNullOrEmpty(email)){
+            throw UserException.resendActivationEmailNoEmail();
+        }
+        Optional<User> opt = userRepository.findByEmail(email);
+        if (opt.isEmpty()){
+            throw UserException.resendActivationEmailNotFound();
+        }
+
+        User user = opt.get();
+
+        if (user.isActivated()){
+            throw UserException.activateAlready();
+        }
+
+        user.setToken(SecurityUtil.generateToken());
+        user.setTokenExpire(nextMinute(30));
+        User save = userRepository.save(user);
+
+        sendEmail(save);
+        return "resendActivationEmail";
     }
 
     public User updateUser(User user) {

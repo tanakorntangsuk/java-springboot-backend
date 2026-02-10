@@ -5,6 +5,7 @@ import com.example.backend.entity.User;
 import com.example.backend.exception.BaseException;
 import com.example.backend.service.RegisterService;
 import com.example.backend.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +46,12 @@ public class UserController {
     public ResponseEntity<ActivateResponse> activate(@RequestBody ActivateRequest request) throws BaseException {
         ActivateResponse response = userService.activate(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/resend-activation-email")
+    public ResponseEntity<String> resendActivationEmail(@RequestBody ResendActivationEmailRequest request) throws BaseException {
+        String resendEmail = userService.resendActivationEmail(request);
+        return ResponseEntity.ok(resendEmail);
     }
 
     @GetMapping("/refresh-token")

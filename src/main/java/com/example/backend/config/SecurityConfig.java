@@ -26,7 +26,8 @@ public class SecurityConfig {
             "/api/login",
             "/actuator/**",
             "/socket/**",
-            "/api/activate"
+            "/api/activate",
+            "/api/resend-activation-email"
     };
 
     @Bean

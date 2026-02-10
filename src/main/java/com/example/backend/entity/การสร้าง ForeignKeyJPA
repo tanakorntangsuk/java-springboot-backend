@@ -1,0 +1,7 @@
+
+ 1. @OneToOne Map ทั้งต้นทางและปลายทาง
+        - ต้นทางรับ Map =>  @OneToOne(mappedBy = "เมดทอดFk")
+        - ปลายทางระบุว่าจะ Map ไปหาต้นทางด้วย Fk ที่ชืออะไร =>  @JoinColumn(name = "ชื่ออะไร")
+
+ 2. @OneToMany Map ปลายทางมา โดยใช้ List => @OneToMany(mappedBy = "เมดทอดFk")
+ 3. @ManyToOne Map ต้นทางมา โดยระบุว่าจะ Map ไปหาต้นทางด้วย Fk ที่ชืออะไร =>  @JoinColumn(name = "ชื่ออะไร")

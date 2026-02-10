@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Backend</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            padding: 30px 0;
+        }
+
+        .email-box {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            background-color: #0d6efd;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+            color: #333333;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .content p {
+            margin: 0 0 16px;
+        }
+
+        .footer {
+            background-color: #f1f3f5;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #0d6efd;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="email-box">
+
+        <div class="header">
+            System Notification
+        </div>
+
+        <div class="content">
+            <p>Dear ${P_NAME},</p>
+
+            <p>
+                This email is to inform you that your request has been processed successfully.
+            </p>
+
+            <p>
+                If you did not perform this action, please contact our support team immediately.
+            </p>
+
+            <a href="${P_LINK}" class="btn">View Details</a>
+
+            <p style="margin-top: 30px;">
+                Best regards,<br>
+                <strong>System Administrator</strong>
+            </p>
+        </div>
+
+        <div class="footer">
+            © 2026 Your Company Name. All rights reserved.<br>
+            This is an automated message. Please do not reply.
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

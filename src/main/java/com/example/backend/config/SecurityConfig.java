@@ -26,7 +26,7 @@ public class SecurityConfig {
             "/api/login",
             "/actuator/**",
             "/socket/**",
-            "/chat/**"
+            "/api/activate"
     };
 
     @Bean

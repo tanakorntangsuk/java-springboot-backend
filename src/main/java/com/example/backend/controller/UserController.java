@@ -1,10 +1,8 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.LoginRequest;
-import com.example.backend.dto.RegisterResponse;
+import com.example.backend.dto.*;
 import com.example.backend.entity.User;
 import com.example.backend.exception.BaseException;
-import com.example.backend.dto.RegisterRequest;
 import com.example.backend.service.RegisterService;
 import com.example.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +30,20 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) throws BaseException {
-        String response = userService.login(request);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) throws BaseException {
+        LoginResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) throws BaseException {
+        RegisterResponse user = userService.create(request);
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/activate")
+    public ResponseEntity<ActivateResponse> activate(@RequestBody ActivateRequest request) throws BaseException {
+        ActivateResponse response = userService.activate(request);
         return ResponseEntity.ok(response);
     }
 
@@ -41,12 +51,6 @@ public class UserController {
     public ResponseEntity<String> refreshToken() throws BaseException {
         String token = userService.refreshToken();
         return ResponseEntity.ok(token);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) throws BaseException {
-        RegisterResponse user = userService.create(request);
-        return ResponseEntity.ok(user);
     }
 
     // การส่งรูป/ไฟล์

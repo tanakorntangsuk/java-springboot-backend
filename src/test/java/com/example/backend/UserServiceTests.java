@@ -10,6 +10,7 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.service.AddressService;
 import com.example.backend.service.SocialService;
 import com.example.backend.service.UserService;
+import com.example.backend.util.SecurityUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -41,10 +42,12 @@ class UserServiceTests {
 	@Test
 	void testCreateUser() throws BaseException {
 
+		String token = SecurityUtil.generateToken();
 		RegisterRequest request = new RegisterRequest();
 		request.setEmail(TestData.email);
 		request.setPassword(TestData.password);
 		request.setName(TestData.name);
+		request.setToken(token);
 
 		RegisterResponse response = userService.create(request);
 

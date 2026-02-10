@@ -1,15 +1,11 @@
+server:
+  port: 8080
+
 spring:
-  mail:
-    host: smtp.gmail.com #gmail
-    port: 587
-    username: tanakorn.devtest
-    password: wmns qeay vjyz slki
-    properties:
-      mail:
-        smtp:
-          auth: ture
-          starttls:
-            enable: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: "my-awesome-app"
   jpa:
     hibernate:
       ddl-auto: update

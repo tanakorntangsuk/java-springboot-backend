@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -29,4 +30,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Address> addresses;
+
+    private boolean activated; // เช็คว่ายืนยันเมล การสมัครรึยัง
+
+    private String token; // ไม่ใช่ JWT token การส่งเมล
+
+    private Date tokenExpire;
 }

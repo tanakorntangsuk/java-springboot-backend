@@ -1,37 +1,37 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.LoginRequest;
-import com.example.backend.dto.RegisterRequest;
-import com.example.backend.dto.RegisterResponse;
+import com.example.backend.business.EmailBusiness;
+import com.example.backend.dto.*;
 import com.example.backend.entity.User;
 import com.example.backend.exception.BaseException;
 import com.example.backend.exception.UserException;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.util.SecurityUtil;
+import io.netty.util.internal.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final UserMapper userMapper;
-
     private final TokenService tokenService;
+    private final EmailBusiness emailBusiness;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, TokenService tokenService) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, TokenService tokenService, EmailBusiness emailBusiness) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.tokenService = tokenService;
+        this.emailBusiness = emailBusiness;
     }
 
     public List<User> getAllUsers() {
@@ -54,7 +54,7 @@ public class UserService {
         return tokenService.tokenize(user);
     }
 
-    public String login(LoginRequest request) throws BaseException {
+    public LoginResponse login(LoginRequest request) throws BaseException {
         {
             String email = request.getEmail();
             String password = request.getPassword();
@@ -70,8 +70,15 @@ public class UserService {
                 throw UserException.loginFailPasswordIncorrect();
             }
 
-            // TODO JWT
-            return tokenService.tokenize(user);
+            // ตรวจสอบว่า ยืนยัน activate รึยัง
+            if (!user.isActivated()){
+                throw UserException.loginFailUserUnActivated();
+            }
+
+            // JWT
+            LoginResponse response = new LoginResponse();
+            response.setToken(tokenService.tokenize(user));
+            return response;
         }
     }
 
@@ -80,6 +87,7 @@ public class UserService {
             String email = request.getEmail();
             String name = request.getName();
             String password = request.getPassword();
+            String token = SecurityUtil.generateToken();
 
             // validate
             if (Objects.isNull(email)) {
@@ -102,12 +110,59 @@ public class UserService {
             u.setEmail(email);
             u.setPassword(passwordEncoder.encode(password));
             u.setName(name);
+            u.setToken(token);
+            u.setTokenExpire(nextMinute(30));
 
             User user = userRepository.save(u);
+
+            //ส่งเมลหลักสร้าง user
+            sendEmail(user);
 
             // map -> response
             return userMapper.toRegisterResponse(user);
         }
+    }
+
+    private Date nextMinute(int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, minute);
+        return calendar.getTime();
+    }
+
+    private void sendEmail(User user) {
+        String token = user.getToken();
+        try {
+            emailBusiness.sendActivateUserEmail(user.getEmail(), user.getName(), token);
+        } catch (BaseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ActivateResponse activate(ActivateRequest request) throws BaseException {
+        String token = request.getToken();
+        if (StringUtil.isNullOrEmpty(token)){
+            throw UserException.activateNoToken();
+        }
+        Optional<User> opt = userRepository.findByToken(token);
+        if (opt.isEmpty()){
+            throw UserException.activateFail();
+        }
+        User user = opt.get();
+        Date now = new Date();
+        Date expireDate = user.getTokenExpire();
+
+        // Token หมดอายุ
+        if (now.after(expireDate)){
+            // TODO: re-email
+
+            throw UserException.activateTokenExpireDate();
+        }
+        user.setActivated(true);
+        userRepository.save(user);
+
+        ActivateResponse response = new ActivateResponse();
+        response.setSuccess(true);
+        return response;
     }
 
     public User updateUser(User user) {

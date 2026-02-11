@@ -5,7 +5,6 @@ import com.example.backend.entity.User;
 import com.example.backend.exception.BaseException;
 import com.example.backend.service.RegisterService;
 import com.example.backend.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +26,18 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping(value="/profile")
+    public ResponseEntity<UserResponse> getMyUsersProfile() throws BaseException {
+        UserResponse users = userService.getMyUsersProfile();
+        return ResponseEntity.ok(users);
+    }
+
+    @PutMapping(value="/profile")
+    public ResponseEntity<UserResponse> updateMyUsersProfile(@RequestBody UserRequest request) throws BaseException {
+        UserResponse users = userService.updateMyUsersProfile(request);
         return ResponseEntity.ok(users);
     }
 
@@ -59,6 +70,13 @@ public class UserController {
         String token = userService.refreshToken();
         return ResponseEntity.ok(token);
     }
+
+    @DeleteMapping("/test-delete")
+    public ResponseEntity<Void> testDeleteMyAccount() throws BaseException {
+        userService.testDeleteMyAccount();
+        return ResponseEntity.ok().build();
+    }
+
 
     // การส่งรูป/ไฟล์
     @PostMapping

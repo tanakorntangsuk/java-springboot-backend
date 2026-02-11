@@ -8,6 +8,7 @@ import com.example.backend.entity.User;
 import com.example.backend.exception.BaseException;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.AddressService;
+import com.example.backend.service.CacheService;
 import com.example.backend.service.SocialService;
 import com.example.backend.service.UserService;
 import com.example.backend.util.SecurityUtil;
@@ -36,6 +37,8 @@ class UserServiceTests {
 	private SocialService socialService;
 	@Autowired
 	private AddressService addressService;
+	@Autowired
+	private CacheService cacheService;
 
 
 	@Order(1)
@@ -75,7 +78,7 @@ class UserServiceTests {
 		Assertions.assertTrue(opt.isPresent());
 
 		User user = opt.get();
-		User updatedUser = userService.updateNameById(user.getId(),"Golf");
+		User updatedUser = cacheService.updateNameById(user.getId(),"Golf");
 
 		Assertions.assertNotNull(updatedUser);
 		Assertions.assertEquals("Golf",updatedUser.getName());

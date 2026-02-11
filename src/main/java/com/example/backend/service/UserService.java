@@ -12,6 +12,7 @@ import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
@@ -25,17 +26,54 @@ public class UserService {
     private final TokenService tokenService;
     private final EmailBusiness emailBusiness;
 
+    private final CacheService userCacheService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, TokenService tokenService, EmailBusiness emailBusiness) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, TokenService tokenService, EmailBusiness emailBusiness, CacheService userCacheService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.tokenService = tokenService;
         this.emailBusiness = emailBusiness;
+        this.userCacheService = userCacheService;
     }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public UserResponse getMyUsersProfile() throws BaseException {
+        Optional<String> opt = SecurityUtil.getCurrentUserId();
+        if (opt.isEmpty()) {
+            throw UserException.unauthorized();
+        }
+
+        String userId = opt.get();
+
+        Optional<User> optUser = userCacheService.findById(userId);
+        if (optUser.isEmpty()) {
+            throw UserException.notFound();
+        }
+        return userMapper.toUserResponse(optUser.get());
+    }
+
+    public UserResponse updateMyUsersProfile(UserRequest request) throws BaseException {
+
+        Optional<String> opt = SecurityUtil.getCurrentUserId();
+        if (opt.isEmpty()) {
+            throw UserException.unauthorized();
+        }
+
+        String userId = opt.get();
+
+        // validate name not null
+        if (ObjectUtils.isEmpty(request.getName())) {
+            throw UserException.updateNameNull();
+        }
+
+        User user = userCacheService.updateNameById(userId, request.getName());
+
+        return userMapper.toUserResponse(user);
     }
 
     public String refreshToken() throws BaseException {
@@ -46,7 +84,7 @@ public class UserService {
 
         String userId = opt.get();
 
-        Optional<User> optUser = userRepository.findById(userId);
+        Optional<User> optUser = userCacheService.findById(userId);
         if (optUser.isEmpty()) {
             throw UserException.notFound();
         }
@@ -71,7 +109,7 @@ public class UserService {
             }
 
             // ตรวจสอบว่า ยืนยัน activate รึยัง
-            if (!user.isActivated()){
+            if (!user.isActivated()) {
                 throw UserException.loginFailUserUnActivated();
             }
 
@@ -138,19 +176,20 @@ public class UserService {
         }
     }
 
+    //การยืนยันเมล
     public ActivateResponse activate(ActivateRequest request) throws BaseException {
         String token = request.getToken();
-        if (StringUtil.isNullOrEmpty(token)){
+        if (StringUtil.isNullOrEmpty(token)) {
             throw UserException.activateNoToken();
         }
         Optional<User> opt = userRepository.findByToken(token);
-        if (opt.isEmpty()){
+        if (opt.isEmpty()) {
             throw UserException.activateFail();
         }
 
         User user = opt.get();
 
-        if (user.isActivated()){
+        if (user.isActivated()) {
             throw UserException.activateAlready();
         }
 
@@ -158,7 +197,7 @@ public class UserService {
         Date expireDate = user.getTokenExpire();
 
         // Token หมดอายุ
-        if (now.after(expireDate)){
+        if (now.after(expireDate)) {
             // TODO: re-email
             throw UserException.activateTokenExpireDate();
         }
@@ -172,17 +211,17 @@ public class UserService {
 
     public String resendActivationEmail(ResendActivationEmailRequest request) throws BaseException {
         String email = request.getEmail();
-        if (StringUtil.isNullOrEmpty(email)){
+        if (StringUtil.isNullOrEmpty(email)) {
             throw UserException.resendActivationEmailNoEmail();
         }
         Optional<User> opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()){
+        if (opt.isEmpty()) {
             throw UserException.resendActivationEmailNotFound();
         }
 
         User user = opt.get();
 
-        if (user.isActivated()){
+        if (user.isActivated()) {
             throw UserException.activateAlready();
         }
 
@@ -198,14 +237,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateNameById(String id, String name) throws BaseException {
-        User user = userRepository.findById(id).orElseThrow(UserException::notFound);
+    public void testDeleteMyAccount() throws BaseException {
+        Optional<String> opt = SecurityUtil.getCurrentUserId();
+        if (opt.isEmpty()) {
+            throw UserException.unauthorized();
+        }
 
-        user.setName(name);
-        return userRepository.save(user);
+        String userId = opt.get();
+        userCacheService.deleteById(userId);
+
     }
 
-    public void deleteById(String id) {
-        userRepository.deleteById(id);
-    }
 }

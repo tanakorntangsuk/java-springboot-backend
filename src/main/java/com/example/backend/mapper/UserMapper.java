@@ -1,6 +1,7 @@
 package com.example.backend.mapper;
 
 import com.example.backend.dto.RegisterResponse;
+import com.example.backend.dto.UserResponse;
 import com.example.backend.entity.User;
 import org.mapstruct.Mapper;
 
@@ -8,5 +9,7 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
 
     RegisterResponse toRegisterResponse(User user);
+
+    UserResponse toUserResponse(User user);
 
 }

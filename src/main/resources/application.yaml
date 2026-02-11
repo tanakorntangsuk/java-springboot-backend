@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-spring:
-  application:
-    name: common
-=======
 server:
   port: 8080
 
@@ -31,4 +26,3 @@ app:
     issuer: "BackendService"
   email:
     from: tanakorn.devtest@gmail.com
->>>>>>> 5deaf85dec9c61dc7a78fdeef48c36e17495c1e4

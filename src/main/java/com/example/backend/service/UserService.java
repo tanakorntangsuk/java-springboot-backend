@@ -210,13 +210,13 @@ public class UserService {
     }
 
     public String resendActivationEmail(ResendActivationEmailRequest request) throws BaseException {
-        String email = request.getEmail();
-        if (StringUtil.isNullOrEmpty(email)) {
-            throw UserException.resendActivationEmailNoEmail();
+        String token = request.getToken();
+        if (StringUtil.isNullOrEmpty(token)) {
+            throw UserException.resendActivationEmailNoToken();
         }
-        Optional<User> opt = userRepository.findByEmail(email);
+        Optional<User> opt = userRepository.findByToken(token);
         if (opt.isEmpty()) {
-            throw UserException.resendActivationEmailNotFound();
+            throw UserException.resendActivationTokenNotFound();
         }
 
         User user = opt.get();
@@ -225,6 +225,7 @@ public class UserService {
             throw UserException.activateAlready();
         }
 
+        // ถ้า token ถูก ส่งเมลใหม่
         user.setToken(SecurityUtil.generateToken());
         user.setTokenExpire(nextMinute(30));
         User save = userRepository.save(user);

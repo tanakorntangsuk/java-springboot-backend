@@ -150,7 +150,7 @@ class UserServiceTests {
 		Assertions.assertNotNull(addresses);
 		Assertions.assertFalse(addresses.isEmpty());
 
-		userService.deleteById(user.getId());
+		cacheService.deleteById(user.getId());
 
 		Optional<User> optDelete = userRepository.findByEmail(TestData.email); //ค้นหาอีกรอบ
 		Assertions.assertTrue(optDelete.isEmpty()); //ต้องไม่มี
